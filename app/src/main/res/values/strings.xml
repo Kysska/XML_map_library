@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">XML_map_parser_library</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_world_cinema">Сегодня в кинотеатре</string>
+    <string name="choose_places">Выбранные места:</string>
+    <string name="result">Итог:</string>
+    <string name="clean">Очистить:</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="back_cinema">#1B1A28</color>
+    <color name="place_stroke">#684569</color>
+    <color name="place_selected">#993E9A</color>
+    <color name="place_reserved">#392639</color>
+    <color name="region_selected">#536DFE</color>
+    <color name="button_zoom">#B6B6B6</color>
+</resources>
