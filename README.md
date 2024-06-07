@@ -9,7 +9,7 @@
 
 3. Импортируйте ресурс XML
 [Название библиотеки] позволяет использовать Векторные ассеты в формате XML. Вы можете испортировать svg файл прямо в среду Android Studio, но рекомендую использовать данный источник[https://inloop.github.io/svg2android/] для конвертации файла.
-![alt text](image-1.png)
+<img src="/images/image-2.png" alt="alt text" width="200"/>
 
 4. Используйте метод showScheme
 Для отображения схемы или другого ресурса используйте метод showScheme в вашем коде. Например:
@@ -20,7 +20,7 @@ showScheme(xmlResourceId)
 Замените "russia_map" на имя вашего файла ресурса.
 
 ### Примеры использования
-<img src="image-2.png" alt="alt text" width="200"/> <img src="image-3.png" alt="alt text" width="200"/>
+<img src="/images/image-3.png" alt="alt text" width="200"/> <img src="/images/image-1.png" alt="alt text" width="200"/>
 
 
 ### Справочник
