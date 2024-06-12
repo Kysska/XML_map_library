@@ -34,6 +34,7 @@ class SchemeView @JvmOverloads constructor(
 
     private val titles : MutableList<Text> = mutableListOf()
     private val markers : MutableList<Marker> = mutableListOf()
+    private val partToMarkerMap = mutableMapOf<Part, Marker>()
 
     var selectedFillColor : Int = DefaultValues.DEFAULT_SELECTED_COLOR
     var selectedStrokeColor : Int = DefaultValues.DEFAULT_SELECTED_STROKE_COLOR
@@ -45,6 +46,7 @@ class SchemeView @JvmOverloads constructor(
     var strokeMiterLimit : Float? = null
     var isEnabledPart : Boolean = true
 
+    var isMultiSelectEnabled: Boolean = false
     private var onPartClickListener : OnPartClickListener? = null
 
     //Переменные для сохранения текущего касания
@@ -63,7 +65,9 @@ class SchemeView @JvmOverloads constructor(
         drawingHelper.drawPart(
             canvas,
             partManager.getPart(),
+            isMultiSelectEnabled,
             partManager.getSelectedPart(),
+            partManager.getSelectedParts(),
             markers,
             titles,
             selectedFillColor, selectedStrokeColor, strokeWidth, strokeAlpha, fillAlpha, strokeLineCap, strokeLineJoin, strokeMiterLimit)
@@ -161,10 +165,13 @@ class SchemeView @JvmOverloads constructor(
         return partManager.handleTouch(x, y)
     }
 
-    // Выбирает часть для подсветки и вызывает перерисовку представления.
-    fun clickToPart(part : Part) {
-        if(part.isEnabledPart){
-            selectPart(part)
+    fun clickToPart(part: Part) {
+        if (part.isEnabledPart) {
+            if (isMultiSelectEnabled) {
+                multiSelectPart(part)
+            } else {
+                selectPart(part)
+            }
             invalidate()
         }
     }
@@ -172,6 +179,22 @@ class SchemeView @JvmOverloads constructor(
     private fun selectPart(part: Part?) {
         partManager.selectPart(part)
     }
+
+    fun deselectPart(part: Part?) {
+        partManager.deselectedParts(part)
+        invalidate()
+    }
+
+    fun multiSelectPart(part: Part?){
+        partManager.multiSelectPart(part)
+        invalidate()
+    }
+
+    fun deselectAllParts(){
+        partManager.clearSelectPart()
+        invalidate()
+    }
+
 
     /**
      * Изменяем состояние part на блокировку нажатия
@@ -271,20 +294,24 @@ class SchemeView @JvmOverloads constructor(
         invalidate()
     }
 
-    fun addText(text: String, part: Part, paint: Paint) {
+    fun addText(title: String, part: Part, paint: Paint) {
         val x = part.region.bounds.exactCenterX()
         val y = part.region.bounds.exactCenterY()
-        titles.add(Text(x, y, text, paint))
+        val text = Text(x, y, title, paint)
+        titles.add(text)
         invalidate()
     }
 
     fun addText(part: Part, paint: Paint) {
         val x = part.region.bounds.exactCenterX()
         val y = part.region.bounds.exactCenterY()
-        val text = part.name
-        titles.add(Text(x, y, text, paint))
+        val title = part.name
+        val text = Text(x, y, title, paint)
+        titles.add(text)
         invalidate()
     }
+
+
 
     /**
      * Добавляет маркер (круг или изображение) и центрирует его относительно части модели данных или по указанным координатам.
@@ -299,15 +326,16 @@ class SchemeView @JvmOverloads constructor(
      * @param paint Paint для стиля маркера.
      */
 
-    fun addMarker(x: Float, y: Float, radius: Float, paint: Paint?) {
+    fun addMarker(x: Float, y: Float, radius: Float, paint: Paint?) : Marker {
         val marker = MarkerBuilder(x, y, radius)
             .setPaint(paint)
             .build()
         markers.add(marker)
         invalidate()
+        return marker
     }
 
-    fun addMarker(part: Part, radius: Float, paint: Paint?) {
+    fun addMarker(part: Part, radius: Float, paint: Paint?) : Marker{
         val x = part.region.bounds.exactCenterX()
         val y = part.region.bounds.exactCenterY()
         val marker = MarkerBuilder(x, y, radius)
@@ -315,25 +343,50 @@ class SchemeView @JvmOverloads constructor(
             .build()
         markers.add(marker)
         invalidate()
+        return marker
     }
 
-    fun addMarker(part: Part, radius: Float, drawable: Drawable?, paint: Paint?) {
-        val x = part.region.bounds.exactCenterX()
-        val y = part.region.bounds.exactCenterY()
-        val marker = MarkerBuilder(x, y, radius)
-            .setDrawable(drawable)
-            .build()
-        markers.add(marker)
+    fun addMarker(part: Part, radius: Float, drawable: Drawable?) : Marker {
+        if(drawable != null){
+            val bounds = part.region.bounds
+            val x = bounds.exactCenterX() - (radius / 2)
+            val y = bounds.exactCenterY() - (radius / 2)
+            val marker = MarkerBuilder(x, y, radius)
+                .setDrawable(drawable)
+                .build()
+            markers.add(marker)
+            invalidate()
+            return marker
+        }
+        else{
+            return addMarker(part, radius, paint = null)
+        }
+    }
+
+    fun addMarker(x: Float, y: Float, radius: Float, drawable: Drawable?) : Marker {
+        if(drawable != null){
+            val marker = MarkerBuilder(x, y, radius)
+                .setDrawable(drawable)
+                .build()
+            markers.add(marker)
+            return marker
+        }
+        else{
+            return addMarker(x, y, radius = radius, paint = null)
+        }
+    }
+
+    fun removeMarker(marker: Marker) {
+        markers.remove(marker)
         invalidate()
     }
 
-    fun addMarker(x: Float, y: Float, radius: Float, drawable: Drawable?) {
-        val marker = MarkerBuilder(x, y, radius)
-            .setDrawable(drawable)
-            .build()
-        markers.add(marker)
+    fun removeAllMarkers(){
+        markers.clear()
         invalidate()
     }
+
+
 
     fun setOnPartClickListener(listener: OnPartClickListener) {
         onPartClickListener = listener

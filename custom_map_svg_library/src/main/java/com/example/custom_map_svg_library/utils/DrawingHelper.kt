@@ -15,7 +15,9 @@ internal class DrawingHelper {
     fun drawPart(
         canvas: Canvas,
         parts: List<Part>,
+        isMultiSelectedEnabled : Boolean,
         selectedPart: Part?,
+        selectedParts : List<Part>,
         markers: List<Marker>,
         titles: List<Text>,
         selectedFillColor: Int,
@@ -36,7 +38,11 @@ internal class DrawingHelper {
 
             paint.run {
                 style = Paint.Style.FILL
-                color = if(selectedPart == part) selectedFillColor else part.color
+                color = if(isMultiSelectedEnabled){
+                    if(part in selectedParts) selectedFillColor else part.color
+                } else{
+                    if(selectedPart == part) selectedFillColor else part.color
+                }
                 alpha = ((fillAlpha ?: part.fillAlpha) * 255).toInt()
 
                 canvas.drawPath(path, this)
@@ -67,6 +73,7 @@ internal class DrawingHelper {
         }
 
         for (marker in markers) {
+            Log.d("marker list", marker.toString())
             if (marker.bitmap != null) {
                 canvas.drawBitmap(marker.bitmap, marker.x, marker.y, paint)
             } else {

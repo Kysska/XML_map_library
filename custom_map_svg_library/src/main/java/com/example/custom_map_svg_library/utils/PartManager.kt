@@ -5,6 +5,7 @@ import com.example.custom_map_svg_library.models.Part
 
 internal class PartManager(private val parts: MutableList<Part> = mutableListOf()) {
     private var selectedPart : Part? = null
+    private var selectedParts: MutableList<Part> = mutableListOf()
 
     fun setPart(part: List<Part>) {
         this.parts.clear()
@@ -13,6 +14,22 @@ internal class PartManager(private val parts: MutableList<Part> = mutableListOf(
 
     fun selectPart(part: Part?) {
         selectedPart = part
+    }
+
+    fun multiSelectPart(part: Part?){
+        if (part != null) {
+            selectedParts.add(part)
+        }
+    }
+
+    fun deselectedParts(part: Part?){
+        if(part != null){
+            selectedParts.remove(part)
+        }
+    }
+
+    fun clearSelectPart(){
+        selectedParts.clear()
     }
 
     fun setFillColorParts(color : Int, parts : List<Part>){
@@ -58,6 +75,8 @@ internal class PartManager(private val parts: MutableList<Part> = mutableListOf(
     }
 
     fun getSelectedPart(): Part? = selectedPart
+
+    fun getSelectedParts() : List<Part> = selectedParts
 
     fun changeColorPart(part: Part, color: Int) : Boolean{
         return if (parts.contains(part)) {

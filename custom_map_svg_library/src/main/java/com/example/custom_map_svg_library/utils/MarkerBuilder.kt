@@ -38,11 +38,11 @@ class MarkerBuilder(private val x: Float, private val y: Float, private val radi
             drawable!!.draw(canvas)
 
 
-            Marker(x, y, radius, bitmap = bitmap, paint = paint)
+            Marker( x, y, radius, bitmap = bitmap, paint = paint)
         } else if (paint != null) {
-            Marker(x, y, radius, paint!!)
+            Marker( x, y, radius, paint!!)
         } else {
-            Marker(x, y, radius)
+            Marker( x, y, radius)
         }
     }
 

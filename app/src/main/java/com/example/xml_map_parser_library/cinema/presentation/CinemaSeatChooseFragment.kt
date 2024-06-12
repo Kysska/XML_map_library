@@ -1,5 +1,6 @@
 package com.example.xml_map_parser_library.cinema.presentation
 
+import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import com.example.custom_map_svg_library.models.Marker
 import com.example.custom_map_svg_library.models.Part
 import com.example.custom_map_svg_library.utils.OnPartClickListener
 import com.example.xml_map_parser_library.R
@@ -49,6 +51,8 @@ class CinemaSeatChooseFragment : Fragment() {
         val cinema = getCinema()
         val places = dataRepository.getPlace().filter { it.idCinema == cinema.id }
         val placeId = places.map { it.id }
+        val markers = mutableMapOf<Part, Marker>()
+        val selectedPart = mutableListOf<Part>()
         val xmlResourceId = resources.getIdentifier("cinema", "raw", requireActivity().packageName)
 
         val selectedFillColor = ContextCompat.getColor(requireContext(), R.color.place_selected)
@@ -59,17 +63,35 @@ class CinemaSeatChooseFragment : Fragment() {
             time.text = cinema.time
             textDesc.text = cinema.desc
             cleanTextButton.setOnClickListener {
+                schemeView.deselectAllParts()
+                schemeView.removeAllMarkers()
                 listPlaces.removeAllViews()
                 totalSum = 0
                 price.text = "${totalSum}руб."
             }
             schemeView.showScheme(xmlResourceId)
             schemeView.selectedFillColor = selectedFillColor
+            schemeView.isMultiSelectEnabled = true
 
             schemeView.setOnPartClickListener(object : OnPartClickListener {
                 override fun onPartClick(part: Part) {
-                    schemeView.clickToPart(part)
-                    settingPartClick(part, cinema)
+                    if(part in selectedPart){
+                        schemeView.deselectPart(part)
+                        selectedPart.remove(part)
+                        val markerToRemove = markers[part]
+                        markerToRemove?.let {
+                            markers.remove(part)
+                            schemeView.removeMarker(it)
+                        }
+                    }
+                    else{
+                        schemeView.clickToPart(part)
+                        selectedPart.add(part)
+                        val marker = schemeView.addMarker(part, 30f, drawable = ContextCompat.getDrawable(requireContext(), R.drawable.baseline_done_24))
+                        markers[part] = marker
+                        settingPartClick(part, cinema)
+                    }
+
                 }
             })
 
