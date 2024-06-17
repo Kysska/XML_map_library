@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import com.example.custom_map_svg_library.models.Marker
 import com.example.custom_map_svg_library.models.Part
 import com.example.custom_map_svg_library.models.Text
@@ -27,14 +28,16 @@ class SchemeView @JvmOverloads constructor(
 
 
     //Менеджеры и хелперы для управления частями и рисования
-    private val partManager = PartManager()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal val partManager = PartManager()
     private val drawingHelper = DrawingHelper()
     private val xmlParser = XmlParser(context)
     private val eventHandler =  EventHandler(this)
 
-    private val titles : MutableList<Text> = mutableListOf()
-    private val markers : MutableList<Marker> = mutableListOf()
-    private val partToMarkerMap = mutableMapOf<Part, Marker>()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal val titles : MutableList<Text> = mutableListOf()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal val markers : MutableList<Marker> = mutableListOf()
 
     var selectedFillColor : Int = DefaultValues.DEFAULT_SELECTED_COLOR
     var selectedStrokeColor : Int = DefaultValues.DEFAULT_SELECTED_STROKE_COLOR
@@ -137,27 +140,10 @@ class SchemeView @JvmOverloads constructor(
     }
 
     // Устанавливает список частей для отображения и вызывает перерисовку представления.
-    private fun setListParts(part: List<Part>) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun setListParts(part: List<Part>) {
         partManager.setPart(part)
         invalidate()
-    }
-
-
-    //Блок получения части(частей)
-    fun getParts() : List<Part>{
-        return partManager.getPart()
-    }
-
-    fun getPartById(id: String): Part? {
-        return partManager.getPartById(id)
-    }
-
-    fun getPartsByName(name: String): List<Part> {
-        return partManager.getPartsByName(name)
-    }
-
-    fun getPartsByIndex(index: Int): Part? {
-        return partManager.getPartByIndex(index)
     }
 
     // Определяет, на какую часть было совершено касание по координатам x и y.
@@ -172,12 +158,12 @@ class SchemeView @JvmOverloads constructor(
             } else {
                 selectPart(part)
             }
-            invalidate()
         }
     }
 
-    private fun selectPart(part: Part?) {
+    fun selectPart(part: Part?) {
         partManager.selectPart(part)
+        invalidate()
     }
 
     fun deselectPart(part: Part?) {
@@ -289,25 +275,39 @@ class SchemeView @JvmOverloads constructor(
      */
 
 
-    fun addText(text: String, x: Float, y: Float, paint: Paint) {
-        titles.add(Text(x, y, text, paint))
+    fun addText(title: String, x: Float, y: Float, paint: Paint) : Text {
+        val text = Text(x, y, title, paint)
+        titles.add(text)
         invalidate()
+        return text
     }
 
-    fun addText(title: String, part: Part, paint: Paint) {
+    fun addText(title: String, part: Part, paint: Paint) : Text {
         val x = part.region.bounds.exactCenterX()
         val y = part.region.bounds.exactCenterY()
         val text = Text(x, y, title, paint)
         titles.add(text)
         invalidate()
+        return text
     }
 
-    fun addText(part: Part, paint: Paint) {
+    fun addText(part: Part, paint: Paint) : Text{
         val x = part.region.bounds.exactCenterX()
         val y = part.region.bounds.exactCenterY()
         val title = part.name
         val text = Text(x, y, title, paint)
         titles.add(text)
+        invalidate()
+        return text
+    }
+
+    fun removeText(text: Text){
+        titles.remove(text)
+        invalidate()
+    }
+
+    fun removeAllText(text: Text){
+        titles.clear()
         invalidate()
     }
 

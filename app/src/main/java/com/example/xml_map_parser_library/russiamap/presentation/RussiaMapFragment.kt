@@ -29,32 +29,35 @@ class RussiaMapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val xmlResourceId = resources.getIdentifier("russia", "raw", requireActivity().packageName)
-        val selectedFillColor = ContextCompat.getColor(requireContext(), R.color.region_selected)
-        val selectedStrokeColor = ContextCompat.getColor(requireContext(), R.color.white)
+        val mySelectedFillColor = ContextCompat.getColor(requireContext(), R.color.region_selected)
+        val mySelectedStrokeColor = ContextCompat.getColor(requireContext(), R.color.white)
         binding.apply {
-            russiaMap.showScheme(xmlResourceId)
-            russiaMap.selectedFillColor = selectedFillColor
-            russiaMap.strokeWidth = 0.7f
-            russiaMap.selectedStrokeColor = selectedStrokeColor
+            russiaMap.apply {
+                showScheme(xmlResourceId)
+                selectedFillColor = mySelectedFillColor
+                strokeWidth = 0.7f
+                selectedStrokeColor = mySelectedStrokeColor
 
-            russiaMap.setOnPartClickListener(object : OnPartClickListener{
-                override fun onPartClick(part: Part) {
-                    russiaMap.clickToPart(part)
-                    russiaMap.zoomToPart(part)
-                    val bottomSheetFragment = RegionDetailsBottomFragment.newInstance(part.name)
-                    bottomSheetFragment.show(childFragmentManager, RegionDetailsBottomFragment.TAG)
+                setOnPartClickListener(object : OnPartClickListener{
+                    override fun onPartClick(part: Part) {
+                        clickToPart(part)
+                        zoomToPart(part)
+                        val bottomSheetFragment = RegionDetailsBottomFragment.newInstance(part.name)
+                        bottomSheetFragment.show(childFragmentManager, RegionDetailsBottomFragment.TAG)
+                    }
+                })
+
+                buttonPlus.setOnClickListener {
+                    zoomIn()
                 }
-            })
+                buttonMinus.setOnClickListener {
+                    zoomOut()
+                }
+                buttonEquals.setOnClickListener {
+                    resetZoom()
+                }
+            }
 
-            buttonPlus.setOnClickListener {
-                russiaMap.zoomIn()
-            }
-            buttonMinus.setOnClickListener {
-                russiaMap.zoomOut()
-            }
-            buttonEquals.setOnClickListener {
-                russiaMap.resetZoom()
-            }
         }
     }
 
