@@ -1,2 +1,2 @@
 /build
-!app/debug/*.apk
+!app/build/intermediates/apk/debug/*.apk
