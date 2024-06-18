@@ -22,6 +22,8 @@ showScheme(xmlResourceId)
 ## Примеры использования
 <img src="/images/image-3.jpg" alt="alt text" width="200"/> <img src="/images/image-1.jpg" alt="alt text" width="200"/>
 
+Sample apk находится в папке debug
+
 
 ## Справочник
 
